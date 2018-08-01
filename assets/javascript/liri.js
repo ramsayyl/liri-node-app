@@ -1,17 +1,19 @@
 require("dotenv").config();
 
-// var request = require("request");
-// var fs = require("fs");
+var request = require("request");
+var fs = require("fs");
 
-var keys = require("./keys.js");
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
 
+var keys = require("./keys.js");
 var client = new Twitter(keys.twitter);
 var spotify = new Spotify(keys.spotify);
 
+var choice = process.argv.slice(3).join(" ");
+var textFile = "random.txt";
 
-var Tweet = function() {
+var Liri = function() {
 
   this.findTweets = function() {
     var params = {
@@ -25,31 +27,70 @@ var Tweet = function() {
           console.log(i + ". " + jsonData[i].text);
           console.log("Tweeted at: " + jsonData[i].created_at + "\n\n")
         }
-        // console.log(tweets)
       } else {
         console.log(error);
       }
     });
-  }
-};
-
-var Song = function() {
+  },
 
   this.findSong = function() {
-    spotify.search({type: 'track', query: 'All the Small Things'}, function(err, data) {
+
+    spotify.search({
+      type: 'track',
+      query: choice,
+      limit : 1,
+  }, function(err, data) {
       if(!err) {
-        console.log(data);
+        var json = data.tracks.items;
+
+        var songInfo = [
+          "Artist: " + json[0].artists[0].name,
+          "Song Name: "  + json[0].name,
+          "Album: " + json[0].album.name
+        ].join("\n\n");
+        console.log(songInfo)
       } else {
-        return console.log("Error occured: " + err);
+        choice = "The Sign"
+
+        console.log("Error occured: " + err);
       }
     })
 
+  },
+
+  this.findMovie = function() {
+    var URL = "http://www.omdbapi.com/?i=tt3896198&apikey=dd844c38&t=" + choice;
+
+    request(URL, function(error, response, body) {
+      var json = JSON.parse(body);
+
+      var movieInfo = [
+        "Title: " + json.Title,
+        "Year: " + json.Year,
+        "IMDB Rating: " + json.Ratings[0].Value,
+        "Rotten Tomatoes Rating: " + json.Ratings[1].Value,
+        "Country: " + json.Country,
+        "Language: " + json.Language,
+        "Plot: " + json.Plot,
+        "Actors: " + json.Actors
+      ].join("\n\n");
+      console.log(movieInfo);
+    })
+
+  },
+
+  this.justDoit = function() {
+
+    fs.readFile(textFile, 'utf8', function(err, data) {
+      var text = data.split(",")
+      choice = text[0];
+      value = text[1];
+      console.log("Command: " + choice);
+      console.log("Value: " + value);
+
+    });
+
   }
-}
+};
 
-
-// module.exports = {
-//   Tweet: () => {}
-//   Song: () => {}
-// }
-module.exports = Song
+module.exports = Liri;

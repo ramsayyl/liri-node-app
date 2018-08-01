@@ -1,36 +1,26 @@
 var command = process.argv[2];
-// var term = process.argv.slice(3).join(" ");
 
-// var Tweet = require("./liri.js");
-var Song = require("./liri.js");
-// const { Tweet, Song } = require("./liri")
-// Tweet();
-// Song();
-// var tweet = new Tweet();
-var song = new Song();
+var Liri = require("./liri.js");
+var liri = new Liri();
 
 switch (command) {
   case "my-tweets":
-    // console.log(keys.twitter);
-    // tweet.findTweets();
-
+    liri.findTweets();
     break;
 
   case "spotify-this-song":
-    song.findSong();
-    // console.log(keys.spotify);
+    liri.findSong();
     break;
 
   case "movie-this":
-    console.log("movie");
+    liri.findMovie();
     break;
 
   case "do-what-it-says":
-    console.log("DO IT");
+    liri.justDoit();
     break;
 
-
   default:
-  console.log("Invalid Command");
+    console.log("Invalid Command");
 
 }
